@@ -1,0 +1,11 @@
+# OPTIONAL: the local Hugging Face model (voxscore/ai/local_llm.py).
+# Install on top of requirements.txt, then set AI_LOCAL_ENABLED=True in .env:
+#     pip install -r requirements-ai.txt
+# CPU-only torch is much smaller:
+#     pip install -r requirements-ai.txt --extra-index-url https://download.pytorch.org/whl/cpu
+# Do NOT install this on PythonAnywhere's free plan (no room for torch).
+
+-r requirements.txt
+torch>=2.2
+transformers>=4.51
+accelerate>=0.30

@@ -1,0 +1,133 @@
+/*
+  VoxScore stylesheet. Loaded after Bootstrap, so these rules win where they disagree.
+  Palette: deep ink navy for chrome, warm amber accent, paper-white surfaces.
+  Every colour used for feedback (flat / in tune / sharp) also has a text label or position,
+  so nothing relies on colour alone (see the design rationale in the wireframes).
+*/
+:root {
+  --vx-ink: #1B1F3B;
+  --vx-ink-2: #2B3160;
+  --vx-accent: #F2B544;
+  --vx-accent-dark: #B97F0B;
+  --vx-paper: #FBFAF7;
+  --vx-card: #FFFFFF;
+  --vx-line: #E4E1D8;
+  --vx-muted: #5E6178;
+  --vx-good: #1E7F5A;
+  --vx-warn: #B5531B;
+  --vx-radius: 14px;
+  --bs-body-font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+body { background: var(--vx-paper); color: var(--vx-ink); }
+h1, h2, h3, .vx-display { font-family: "Fraunces", Georgia, serif; letter-spacing: -0.01em; }
+.vx-mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+a { color: var(--vx-ink-2); }
+
+/* ---- Top navigation (every screen) -------------------------------------------------- */
+.vx-nav { background: var(--vx-ink); color: #fff; padding: .65rem 0; position: sticky; top: 0; z-index: 20; }
+.vx-brand { display: flex; align-items: center; gap: .5rem; color: #fff; text-decoration: none;
+  font-family: "Fraunces", serif; font-weight: 700; font-size: 1.25rem; margin-right: 1.5rem; }
+.vx-links { display: flex; gap: .25rem; flex-wrap: wrap; }
+.vx-links a { color: #D7DAF0; text-decoration: none; padding: .4rem .75rem; border-radius: 999px; font-weight: 500; }
+.vx-links a:hover { color: #fff; background: var(--vx-ink-2); }
+.vx-links a[aria-current="page"] { color: var(--vx-ink); background: var(--vx-accent); }
+.vx-user { color: #B9BCD6; font-size: .9rem; }
+.vx-btn-accent, .btn.vx-btn-accent { background: var(--vx-accent); color: var(--vx-ink); border: 0; font-weight: 600; }
+.vx-btn-accent:hover { background: #F6C766; color: var(--vx-ink); }
+.vx-footer { color: var(--vx-muted); font-size: .85rem; padding: 2rem 0; }
+
+/* ---- Buttons ---------------------------------------------------------------------- */
+.btn { border-radius: 10px; min-height: 44px; font-weight: 500; }
+.btn-sm { min-height: 34px; }
+.btn-vx { background: var(--vx-ink); color: #fff; border: 0; }
+.btn-vx:hover, .btn-vx:focus { background: var(--vx-ink-2); color: #fff; }
+.btn-outline-vx { border: 1.5px solid var(--vx-ink); color: var(--vx-ink); background: #fff; }
+.btn-outline-vx:hover { background: var(--vx-ink); color: #fff; }
+
+/* ---- Cards and headings ----------------------------------------------------------- */
+.vx-card { background: var(--vx-card); border: 1px solid var(--vx-line); border-radius: var(--vx-radius); padding: 1.25rem; }
+.vx-page-title { font-size: 2rem; margin-bottom: .25rem; }
+.vx-sub { color: var(--vx-muted); }
+.vx-label { font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; color: var(--vx-muted); }
+.vx-pill { display: inline-block; padding: .2rem .65rem; border-radius: 999px; background: #F1EEE4; font-size: .8rem; font-weight: 600; }
+.vx-pill--ai { background: #EEF0FF; color: var(--vx-ink-2); border: 1px dashed var(--vx-ink-2); }
+
+/* ---- Landing + auth (screen 1) ----------------------------------------------------- */
+.vx-hero { padding: 3rem 0 2rem; }
+.vx-hero h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); }
+.vx-staff-art { height: 160px; border-radius: var(--vx-radius); background:
+  repeating-linear-gradient(180deg, transparent 0 22px, #D9D4C5 22px 24px) var(--vx-card);
+  border: 1px solid var(--vx-line); position: relative; overflow: hidden; }
+.vx-staff-art span { position: absolute; width: 22px; height: 16px; border-radius: 50%; background: var(--vx-ink); transform: rotate(-20deg); }
+.vx-auth-card { max-width: 420px; }
+
+/* ---- Dashboard (screen 2) ---------------------------------------------------------- */
+.vx-big-card { display: flex; flex-direction: column; gap: .75rem; min-height: 260px; }
+.vx-big-card .vx-icon { width: 56px; height: 56px; border-radius: 14px; background: var(--vx-accent); display: grid; place-items: center; }
+.vx-big-card h2 { font-size: 1.8rem; margin: 0; }
+.vx-list-row { display: flex; align-items: center; gap: .75rem; padding: .6rem 0; border-bottom: 1px solid var(--vx-line); }
+.vx-list-row:last-child { border-bottom: 0; }
+
+/* ---- Practice tabs ----------------------------------------------------------------- */
+.vx-tabs { display: flex; gap: .4rem; border-bottom: 2px solid var(--vx-line); margin-bottom: 1.25rem; }
+.vx-tabs a { padding: .55rem 1.1rem; text-decoration: none; color: var(--vx-muted); font-weight: 600; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+.vx-tabs a[aria-current="page"] { color: var(--vx-ink); border-color: var(--vx-accent); }
+
+/* ---- Tuner (screen 3) -------------------------------------------------------------- */
+.vx-note { font-family: "Fraunces", serif; font-size: clamp(4rem, 10vw, 6.5rem); line-height: 1; font-weight: 700; }
+.vx-meter { position: relative; height: 54px; border-radius: 12px; background: #F4F2EC; border: 1px solid var(--vx-line); overflow: hidden; }
+.vx-meter .zone { position: absolute; left: 45%; width: 10%; top: 0; bottom: 0; background: rgba(30,127,90,.14); }
+.vx-meter .tick { position: absolute; top: 0; bottom: 0; width: 1px; background: #CFCABB; }
+.vx-meter .center { position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: var(--vx-good); }
+.vx-meter .needle { position: absolute; top: 4px; bottom: 4px; width: 6px; margin-left: -3px; left: 50%; border-radius: 3px; background: var(--vx-ink); transition: left .08s linear; }
+.vx-meter-labels { display: flex; justify-content: space-between; font-size: .8rem; color: var(--vx-muted); margin-top: .35rem; }
+.vx-bar { height: 10px; border-radius: 6px; background: #ECE8DD; overflow: hidden; }
+.vx-bar > div { height: 100%; width: 0; background: var(--vx-ink-2); transition: width .2s; }
+.vx-mic-btn { width: 220px; height: 60px; border-radius: 30px; font-size: 1.05rem; font-weight: 600; }
+.vx-mic-btn[aria-pressed="true"] { background: var(--vx-warn); }
+.vx-toolkit section { padding: .9rem 0; border-bottom: 1px solid var(--vx-line); }
+.vx-toolkit section:last-child { border-bottom: 0; }
+.vx-keys { display: flex; gap: 2px; }
+.vx-keys button { flex: 1; min-height: 64px; border: 1px solid #BDB8A8; background: #fff; border-radius: 0 0 6px 6px; font-size: .7rem; padding: 0; display: flex; align-items: flex-end; justify-content: center; }
+.vx-keys button.black { background: var(--vx-ink); color: #fff; }
+
+/* ---- Warmups (screens 4-5) --------------------------------------------------------- */
+.vx-chip { border: 1.5px solid var(--vx-line); border-radius: 999px; padding: .35rem .9rem; background: #fff; color: var(--vx-ink); text-decoration: none; font-weight: 600; font-size: .9rem; min-height: 38px; display: inline-flex; align-items: center; }
+.vx-chip[aria-current="true"] { background: var(--vx-ink); color: #fff; border-color: var(--vx-ink); }
+.vx-ex-card { display: flex; flex-direction: column; gap: .4rem; height: 100%; }
+.vx-syllables { display: flex; flex-wrap: wrap; gap: .4rem; }
+.vx-syllables span { padding: .35rem .6rem; border-radius: 8px; background: #F4F2EC; font-weight: 600; min-width: 2.6rem; text-align: center; }
+.vx-syllables span.on { background: var(--vx-accent); }
+.vx-progress { height: 8px; background: #ECE8DD; border-radius: 4px; overflow: hidden; }
+.vx-progress > div { height: 100%; background: var(--vx-ink); width: 0; transition: width .2s; }
+
+/* ---- Studio (screens 6-7) ---------------------------------------------------------- */
+.vx-record-btn { width: 132px; height: 132px; border-radius: 50%; font-size: 1.1rem; font-weight: 700; background: #C2342B; color: #fff; border: 0; box-shadow: 0 8px 24px rgba(194,52,43,.3); }
+.vx-record-btn:hover { background: #A72A22; color: #fff; }
+.vx-record-btn[aria-pressed="true"] { background: var(--vx-ink); box-shadow: none; }
+.vx-trace { width: 100%; height: 170px; border-radius: 12px; border: 1px solid var(--vx-line); background: #fff; display: block; }
+.vx-score-sheet { background: #fff; border: 1px solid var(--vx-line); border-radius: 12px; padding: .5rem; overflow-x: auto; }
+.vx-score-sheet svg .abcjs-note_selected, .vx-score-sheet svg .abcjs-note_selected * { fill: #C2342B; stroke: #C2342B; }
+.vx-part-tab { display: flex; justify-content: space-between; align-items: center; gap: .5rem; border: 1.5px solid var(--vx-line); border-radius: 10px; padding: .5rem .75rem; background: #fff; width: 100%; text-align: left; min-height: 44px; }
+.vx-part-tab[aria-pressed="true"] { border-color: var(--vx-ink); box-shadow: inset 4px 0 0 var(--vx-accent); }
+.vx-ai-panel { background: #F6F6FB; border: 1.5px dashed #9CA0C8; border-radius: var(--vx-radius); padding: 1rem; }
+.vx-pending { border: 1.5px dashed var(--vx-ink-2); border-radius: 12px; padding: .75rem; background: #fff; }
+
+/* ---- Learn (screen 8) -------------------------------------------------------------- */
+.vx-topics a { display: block; padding: .55rem .75rem; border-radius: 10px; text-decoration: none; color: var(--vx-ink); }
+.vx-topics a[aria-current="page"] { background: var(--vx-ink); color: #fff; font-weight: 600; }
+.vx-topics a:hover:not([aria-current]) { background: #F1EEE4; }
+.vx-bubble { border-radius: 12px; padding: .75rem 1rem; }
+.vx-bubble--me { background: #EEF0FF; margin-left: 2rem; }
+.vx-bubble--ai { background: #fff; border: 1px solid var(--vx-line); }
+
+/* ---- Profile (screen 9) ------------------------------------------------------------ */
+.vx-chart { width: 100%; height: auto; background: #fff; }
+.vx-stat { font-family: "Fraunces", serif; font-size: 2rem; font-weight: 700; line-height: 1; }
+.table-vx th { font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: var(--vx-muted); }
+
+@media (max-width: 767px) {
+  .vx-page-title { font-size: 1.6rem; }
+  .vx-brand { margin-right: auto; }
+}

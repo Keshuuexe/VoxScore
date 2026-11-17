@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% load static %}
+{% comment %}
+  Screen 7: Score editor. Sheet music is drawn in the browser by abcjs from ABC that the server
+  writes (voxscore/music.py: notes_to_abc), so there is one source of truth for notation.
+  Edits are made in the note strip under the score and saved as JSON to part-save.
+
+  The AI assistant panel is OPTIONAL and OFF by default (Profile > Settings). Even when on, it
+  only creates a pending suggestion the user must Accept or Reject.
+{% endcomment %}
+{% block title %}{{ score.title }}{% endblock %}
+{% block content %}
+<div class="vx-card mb-3">
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    <form class="d-flex flex-wrap align-items-center gap-2 flex-grow-1" method="post" action="{% url 'score-update' score.pk %}">
+      {% csrf_token %}
+      <label class="visually-hidden" for="score-title">Title</label>
+      <input class="form-control fw-semibold" style="max-width:260px" id="score-title" name="title" value="{{ score.title }}" maxlength="120">
+      <span class="small vx-sub text-nowrap">{{ score.tempo_bpm }} BPM · {{ score.time_signature }}</span>
+      <label class="visually-hidden" for="key_name">Key</label>
+      <select class="form-select" style="max-width:150px" id="key_name" name="key_name">
+        {% for k in key_choices %}<option value="{{ k }}" {% if k == score.key_name %}selected{% endif %}>{{ k }}</option>{% endfor %}
+      </select>
+      <button class="btn btn-outline-vx btn-sm" type="submit">Update</button>
+    </form>
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn btn-vx" type="button" id="play">▶ Play</button>
+      <button class="btn btn-outline-vx" type="button" id="stop">■ Stop</button>
+      <button class="btn btn-outline-vx" type="button" id="undo" disabled>Undo</button>
+      <button class="btn btn-outline-vx" type="button" id="redo" disabled>Redo</button>
+      <div class="dropdown">
+        <button class="btn btn-outline-vx dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">Export</button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="{% url 'score-export' score.pk 'abc' %}">ABC notation (.abc)</a></li>
+          <li><a class="dropdown-item" href="{% url 'score-export' score.pk 'json' %}">Notes as JSON</a></li>
+          <li><button class="dropdown-item" type="button" onclick="window.print()">Print / save as PDF</button></li>
+        </ul>
+      </div>
+      <span class="align-self-center small vx-sub" id="save-state" aria-live="polite">All changes saved</span>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <aside class="col-lg-2">
+    <div class="vx-label mb-2">Parts</div>
+    <div class="d-grid gap-2" id="parts">
+      {% for p in accepted_parts %}
+        <button class="vx-part-tab" type="button" data-part="{{ p.pk }}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">
+          <span>{{ p.name }}</span><span class="small vx-sub">{{ p.get_source_display }}</span>
+        </button>
+      {% endfor %}
+    </div>
+    <a class="btn btn-outline-vx w-100 mt-2" href="{% url 'score-record' score.pk %}">+ Record a part</a>
+  </aside>
+
+  <div class="col-lg-7">
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+      <span class="small fw-semibold">Edit note:</span>
+      <button class="btn btn-outline-vx btn-sm" type="button" id="up" aria-label="Pitch up a half step">▲ Pitch</button>
+      <button class="btn btn-outline-vx btn-sm" type="button" id="down" aria-label="Pitch down a half step">▼ Pitch</button>
+      <label class="visually-hidden" for="dur">Duration</label>
+      <select class="form-select form-select-sm" style="width:auto" id="dur">
+        <option value="0.25">Sixteenth</option><option value="0.5">Eighth</option><option value="0.75">Dotted eighth</option>
+        <option value="1">Quarter</option><option value="1.5">Dotted quarter</option><option value="2">Half</option>
+        <option value="3">Dotted half</option><option value="4">Whole</option>
+      </select>
+      <button class="btn btn-outline-vx btn-sm" type="button" id="del">Delete</button>
+      <span class="small vx-sub ms-auto" id="selected-label">Select a note below</span>
+    </div>
+    <div class="vx-score-sheet" id="sheet" aria-label="Sheet music"></div>
+    <div class="vx-label mt-3 mb-2">Notes in this part (click one to edit it)</div>
+    <div class="d-flex flex-wrap gap-1" id="strip" role="listbox" aria-label="Notes"></div>
+    <form class="mt-3" method="post" id="delete-part-form" action="">
+      {% csrf_token %}
+      <button class="btn btn-link text-danger p-0 small" type="submit" onclick="return confirm('Delete this part?')">Delete this part</button>
+    </form>
+  </div>
+
+  <aside class="col-lg-3">
+    <div class="vx-ai-panel">
+      <div class="d-flex align-items-center gap-2 mb-2">
+        <strong>AI assistant</strong><span class="vx-pill vx-pill--ai">Optional</span>
+      </div>
+      {% if profile.ai_harmony_enabled %}
+        <p class="small mb-2">Harmony suggestions are <strong>on</strong>. The AI only suggests; your melody and edits always come first.</p>
+        <form method="post" action="{% url 'harmony-suggest' score.pk %}" class="d-grid gap-2">
+          {% csrf_token %}
+          <label class="visually-hidden" for="voice">Voice</label>
+          <select class="form-select" id="voice" name="voice">
+            <option value="alto">Alto part</option><option value="tenor">Tenor part</option><option value="bass">Bass part</option>
+          </select>
+          <button class="btn btn-vx" type="submit" {% if not accepted_parts %}disabled{% endif %}>Suggest a harmony part</button>
+        </form>
+      {% else %}
+        <p class="small mb-2">Harmony suggestions are <strong>off</strong> (the default). Your music stays entirely your own.</p>
+        <a class="btn btn-outline-vx w-100" href="{% url 'profile' %}#settings">Turn on in Profile settings</a>
+      {% endif %}
+
+      {% for p in pending_parts %}
+        <div class="vx-pending mt-3">
+          <div class="fw-semibold mb-1">{{ p.name }}</div>
+          <div class="vx-score-sheet mb-2" data-abc-pending="{{ p.pk }}"></div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-vx" type="button" data-preview="{{ p.pk }}">▶ Hear it</button>
+            <form method="post" action="{% url 'part-accept' p.pk %}">{% csrf_token %}<button class="btn btn-sm btn-vx" type="submit">Accept</button></form>
+            <form method="post" action="{% url 'part-reject' p.pk %}">{% csrf_token %}<button class="btn btn-sm btn-outline-vx" type="submit">Reject</button></form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </aside>
+</div>
+{{ editor_data|json_script:"editor-data" }}
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/abcjs@6.4.4/dist/abcjs-basic-min.js"></script>
+<script>
+  window.VOX_URLS = { save: "{% url 'part-save' 0 %}", del: "{% url 'part-delete' 0 %}" };
+</script>
+<script src="{% static 'js/editor.js' %}"></script>
+{% endblock %}

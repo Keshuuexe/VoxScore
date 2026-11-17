@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Train your voice, score your songs{% endblock %}
+{% block content %}
+<section class="vx-hero row g-5 align-items-center">
+  <div class="col-lg-6">
+    <span class="vx-label">For singers, arrangers and a cappella groups</span>
+    <h1 class="mt-2">Train your voice.<br>Score your songs.</h1>
+    <p class="vx-sub fs-5 mt-3">
+      VoxScore puts a tuner, metronome, drones and warmups from many singing traditions in one
+      place, with live feedback on pitch, rhythm and tone. Sing a melody and get sheet music
+      back, no theory degree or music software needed.
+    </p>
+    <div class="d-flex gap-2 mt-4 flex-wrap">
+      <a class="btn vx-btn-accent px-4" href="{% url 'signup' %}">Create a free account</a>
+      <a class="btn btn-outline-vx px-4" href="{% url 'login' %}">Log in</a>
+    </div>
+  </div>
+  <div class="col-lg-6">{% include "voxscore/_staff_art.html" %}</div>
+</section>
+<section class="row g-3 mt-2">
+  <div class="col-md-4"><div class="vx-card h-100"><h3 class="h5">Practice</h3><p class="mb-0 vx-sub">See the note you're singing and how far off it is, with drones, a metronome and guided warmups from a cappella, Western and Indian classical traditions.</p></div></div>
+  <div class="col-md-4"><div class="vx-card h-100"><h3 class="h5">Studio</h3><p class="mb-0 vx-sub">Sing along to the click and VoxScore writes the sheet music: notes, rhythm, key and time signature. Add parts on top to build an arrangement.</p></div></div>
+  <div class="col-md-4"><div class="vx-card h-100"><h3 class="h5">Learn</h3><p class="mb-0 vx-sub">Short theory lessons and an AI tutor that explains ideas using your own recordings.</p></div></div>
+</section>
+{% endblock %}

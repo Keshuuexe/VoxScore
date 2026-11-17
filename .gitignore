@@ -1,0 +1,47 @@
+# ---- Secrets: NEVER commit these ------------------------------------------------------
+.env
+.env.*
+!.env.example
+
+# ---- Virtual environments --------------------------------------------------------------
+venv/
+env/
+.venv/
+
+# ---- Python byproducts -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ---- Django generated output -----------------------------------------------------------
+# collectstatic output, regenerated on every deploy.
+staticfiles/
+media/
+*.log
+
+# NOTE: db.sqlite3 is deliberately NOT ignored. Like Unopsis, the seeded database (warmup
+# library + demo account) is committed so a fresh clone works without seeding. CI fails if
+# it goes missing.
+
+# ---- OS / editor clutter ---------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+
+# ---- Tests / notebooks -----------------------------------------------------------------
+.pytest_cache/
+.coverage
+htmlcov/
+.ipynb_checkpoints/
+
+# ---- Model weights: downloaded into the Hugging Face cache, never committed ------------
+*.bin
+*.safetensors
+*.pt
+*.pth
+*.gguf
+*.onnx
+.cache/

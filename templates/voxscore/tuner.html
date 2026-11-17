@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load static %}
+{% comment %}
+  Screen 3: tuner and live feedback. All audio work is in static/js/tuner.js; when the user
+  stops the mic, the pitch frames are posted to session-save, which scores the session on the
+  server, and the coach button asks the AI coach for tips.
+{% endcomment %}
+{% block title %}Practice: Tuner{% endblock %}
+{% block content %}
+<h1 class="vx-page-title">Practice</h1>
+{% include "voxscore/_practice_tabs.html" %}
+
+<div class="row g-4">
+  <aside class="col-lg-3">
+    <div class="vx-card vx-toolkit">
+      <span class="vx-label">Practice toolkit</span>
+      <section>
+        <div class="fw-semibold mb-2">Metronome</div>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <button class="btn btn-outline-vx btn-sm" type="button" id="bpm-down" aria-label="Slower">−</button>
+          <label class="visually-hidden" for="bpm">Tempo (BPM)</label>
+          <input class="form-control text-center" id="bpm" type="number" min="30" max="240" value="90">
+          <button class="btn btn-outline-vx btn-sm" type="button" id="bpm-up" aria-label="Faster">+</button>
+        </div>
+        <button class="btn btn-outline-vx w-100" type="button" id="metro-toggle" aria-pressed="false">Metronome on</button>
+      </section>
+      <section>
+        <div class="fw-semibold mb-2">Tuning drone</div>
+        <div class="d-flex gap-2">
+          <label class="visually-hidden" for="drone-note">Drone note</label>
+          <select class="form-select" id="drone-note">
+            {% for name in drone_notes %}<option value="{{ forloop.counter0 }}" {% if name == 'C' %}selected{% endif %}>{{ name }}</option>{% endfor %}
+          </select>
+          <button class="btn btn-outline-vx" type="button" id="drone-toggle" aria-pressed="false">Play</button>
+        </div>
+      </section>
+      <section>
+        <div class="fw-semibold mb-2">Note player</div>
+        <div class="vx-keys" id="keys" aria-label="Reference notes C4 to B4"></div>
+      </section>
+    </div>
+  </aside>
+
+  <div class="col-lg-9">
+    <div class="vx-card text-center py-4">
+      <div class="vx-note" id="note" aria-live="polite">–</div>
+      <div class="vx-sub mt-2" id="cents">Start the microphone and sing a note</div>
+      <div class="mx-auto mt-4" style="max-width:600px">
+        <div class="vx-meter" role="img" aria-label="Pitch meter: flat on the left, sharp on the right">
+          <div class="zone"></div>
+          {% for i in "123456789" %}<div class="tick" style="left:{{ forloop.counter }}0%"></div>{% endfor %}
+          <div class="center"></div>
+          <div class="needle" id="needle"></div>
+        </div>
+        <div class="vx-meter-labels"><span>Flat −50¢</span><span>In tune</span><span>Sharp +50¢</span></div>
+      </div>
+
+      <div class="row g-3 mx-auto mt-4 text-start" style="max-width:600px">
+        <div class="col-4"><div class="vx-label">Pitch</div><div class="vx-bar mt-1"><div id="bar-pitch"></div></div><div class="small mt-1" id="txt-pitch">–</div></div>
+        <div class="col-4"><div class="vx-label">Rhythm</div><div class="vx-bar mt-1"><div id="bar-rhythm"></div></div><div class="small mt-1" id="txt-rhythm">Turn on the metronome</div></div>
+        <div class="col-4"><div class="vx-label">Tone</div><div class="vx-bar mt-1"><div id="bar-tone"></div></div><div class="small mt-1" id="txt-tone">–</div></div>
+      </div>
+
+      <button class="btn btn-vx vx-mic-btn mt-4" type="button" id="mic" aria-pressed="false">Start microphone</button>
+      <p class="small vx-sub mt-2 mb-0">Your browser asks for microphone access once. Audio never leaves your device; only pitch numbers are saved.</p>
+    </div>
+
+    <div class="vx-card mt-4 d-none" id="summary" aria-live="polite">
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <h2 class="h5 mb-0">Session saved</h2>
+        <span class="vx-pill" id="sum-pitch"></span>
+        <span class="vx-pill" id="sum-tone"></span>
+        <button class="btn btn-outline-vx btn-sm ms-auto" type="button" id="coach-btn">Get tips from the AI coach</button>
+      </div>
+      <div id="coach" class="mt-3"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script>
+  window.VOX_URLS = { save: "{% url 'session-save' %}", coach: "{% url 'session-coach' 0 %}" };
+</script>
+<script src="{% static 'js/tuner.js' %}"></script>
+{% endblock %}

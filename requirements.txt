@@ -1,0 +1,15 @@
+# Third-party packages VoxScore needs. Install with:  pip install -r requirements.txt
+# This is everything the site needs to run, including on PythonAnywhere's free plan.
+# The optional local AI model has its own file: requirements-ai.txt.
+
+# The web framework. Pinned below 6 so a major release cannot land mid-semester.
+Django>=5.2,<6
+
+# Reads .env into the environment; imported as `environ` by voxsite/secrets_environment.py.
+django-environ>=0.14
+
+# The HTTP client behind the external AI API (Groq). No SDK needed.
+requests>=2.31
+
+# Pitch detection runs in the browser (static/js/audio.js), and sheet music is drawn in the
+# browser with abcjs from a CDN, so no audio or notation packages are needed on the server.

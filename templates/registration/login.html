@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% comment %}
+  Screen 1 (log in). Served by VoxLoginView (voxscore/auth_views.py). Django's LoginView does
+  the work; this template only gives it VoxScore's look. {% csrf_token %} and the hidden
+  `next` field are the two lines that must never be removed.
+{% endcomment %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<div class="row g-5 align-items-center py-lg-4">
+  <div class="col-lg-6">
+    <h1 class="vx-page-title">Train your voice, score your songs.</h1>
+    <p class="vx-sub fs-5">Your tuner, warmups, sheet music and theory tutor in one place.</p>
+    {% include "voxscore/_staff_art.html" %}
+  </div>
+  <div class="col-lg-6 d-flex justify-content-lg-end">
+    <div class="vx-card vx-auth-card w-100">
+      <h2 class="h3 mb-3">Log in</h2>
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger py-2" role="alert">
+          {% for error in form.non_field_errors %}<div>{{ error }}</div>{% endfor %}
+        </div>
+      {% endif %}
+      {% if next %}
+        <div class="alert alert-info py-2 small">Log in to open that page. You'll go straight there after.</div>
+      {% endif %}
+      <form method="post" action="{% url 'login' %}" novalidate>
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.username.id_for_label }}">Username</label>
+          {{ form.username }}
+          {% for error in form.username.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="{{ form.password.id_for_label }}">Password</label>
+          {{ form.password }}
+          {% for error in form.password.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        </div>
+        <input type="hidden" name="next" value="{{ next }}">
+        <button class="btn btn-vx w-100" type="submit">Log in</button>
+      </form>
+      <hr>
+      <a class="btn btn-outline-vx w-100" href="{% url 'signup' %}{% if next %}?next={{ next|urlencode }}{% endif %}">New here? Create an account</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

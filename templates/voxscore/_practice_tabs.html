@@ -1,0 +1,4 @@
+<nav class="vx-tabs" aria-label="Practice">
+  <a href="{% url 'tuner' %}" {% if tab == 'tuner' %}aria-current="page"{% endif %}>Tuner</a>
+  <a href="{% url 'warmup-list' %}" {% if tab == 'warmups' %}aria-current="page"{% endif %}>Warmups</a>
+</nav>

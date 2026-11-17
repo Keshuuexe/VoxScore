@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+{% comment %}
+  Screen 6: Studio record. With `score`, this records ANOTHER part on top of an existing score
+  (the "+ Record a part" loop from the screen flow): tempo and meter are fixed by the score and
+  the existing parts play back while you sing.
+{% endcomment %}
+{% block title %}{% if score %}Record a part{% else %}Studio{% endif %}{% endblock %}
+{% block content %}
+<h1 class="vx-page-title">{% if score %}Record a part for “{{ score.title }}”{% else %}Studio: record a melody{% endif %}</h1>
+<p class="vx-sub">Sing along to the metronome click. VoxScore turns it into sheet music when you stop.</p>
+
+<div class="row g-4">
+  <aside class="col-lg-3">
+    <form class="vx-card" id="setup" onsubmit="return false">
+      <span class="vx-label">Setup</span>
+      {% if score %}
+        <p class="small mt-2 mb-3">{{ score.tempo_bpm }} BPM · {{ score.time_signature }} · {{ score.key_name|default:"key auto" }}<br><span class="vx-sub">Set by the score.</span></p>
+        <label class="form-label mt-1" for="part-name">Part name</label>
+        <input class="form-control mb-3" id="part-name" value="Part {{ existing_parts|length|add:1 }}" maxlength="40">
+        <label class="form-check mb-2"><input class="form-check-input" type="checkbox" id="play-parts" checked> Play existing parts while I sing</label>
+      {% else %}
+        <label class="form-label mt-2" for="title">Project name</label>
+        <input class="form-control mb-3" id="title" placeholder="Untitled song" maxlength="120">
+        <label class="form-label" for="bpm">Tempo (BPM)</label>
+        <input class="form-control mb-3" id="bpm" type="number" min="40" max="200" value="96">
+        <label class="form-label" for="meter">Time signature</label>
+        <select class="form-select mb-3" id="meter">
+          <option value="4/4">4/4</option><option value="3/4">3/4</option><option value="2/4">2/4</option><option value="6/8">6/8</option>
+        </select>
+        <label class="form-label" for="key">Key</label>
+        <select class="form-select mb-3" id="key">
+          <option value="auto">Auto-detect</option>
+          {% for k in key_choices %}<option value="{{ k }}">{{ k }}</option>{% endfor %}
+        </select>
+      {% endif %}
+      <label class="form-check"><input class="form-check-input" type="checkbox" id="count-in" checked> 1-bar count-in</label>
+    </form>
+  </aside>
+
+  <div class="col-lg-9">
+    <div class="vx-card text-center">
+      <button class="vx-record-btn" type="button" id="record" aria-pressed="false">● Record</button>
+      <div class="fw-semibold mt-3" id="status" aria-live="polite">Ready</div>
+      <canvas class="vx-trace mt-3" id="trace" width="1000" height="170" aria-label="Live pitch trace on the beat grid"></canvas>
+      <div class="d-flex justify-content-center gap-2 mt-3">
+        <button class="btn btn-vx" type="button" id="stop" disabled>■ Stop and transcribe</button>
+        <button class="btn btn-outline-vx" type="button" id="discard" disabled>Discard take</button>
+      </div>
+      <p class="small vx-sub mt-3 mb-0">Tip: sing on a clear syllable like “da” or “la”, one note at a time. Headphones stop the click leaking into the mic.</p>
+    </div>
+    {% if abc_parts %}
+      <div class="vx-card mt-3">
+        <div class="vx-label mb-2">Existing parts</div>
+        <div id="existing" class="vx-score-sheet"></div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{{ abc_parts|json_script:"abc-parts" }}
+{{ record_data|json_script:"score-data" }}
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/abcjs@6.4.4/dist/abcjs-basic-min.js"></script>
+<script>window.VOX_URLS = { transcribe: "{% url 'studio-transcribe' %}" };</script>
+<script src="{% static 'js/recorder.js' %}"></script>
+{% endblock %}

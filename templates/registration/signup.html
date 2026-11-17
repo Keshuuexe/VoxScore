@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Create an account{% endblock %}
+{% block content %}
+<div class="row g-5 align-items-center py-lg-4">
+  <div class="col-lg-6">
+    <h1 class="vx-page-title">Make your first score in minutes.</h1>
+    <p class="vx-sub fs-5">Your recordings, scores and practice history are saved to your account.</p>
+    {% include "voxscore/_staff_art.html" %}
+  </div>
+  <div class="col-lg-6 d-flex justify-content-lg-end">
+    <div class="vx-card vx-auth-card w-100">
+      <h2 class="h3 mb-3">Create an account</h2>
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger py-2" role="alert">{{ form.non_field_errors|join:" " }}</div>
+      {% endif %}
+      <form method="post" action="{% url 'signup' %}" novalidate>
+        {% csrf_token %}
+        {% for field in form %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% for error in field.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+          </div>
+        {% endfor %}
+        <input type="hidden" name="next" value="{{ next }}">
+        <button class="btn btn-vx w-100" type="submit">Create account</button>
+      </form>
+      <hr>
+      <a class="btn btn-outline-vx w-100" href="{% url 'login' %}">I already have an account</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

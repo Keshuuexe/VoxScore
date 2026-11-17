@@ -1,0 +1,7 @@
+{% if messages %}
+  <div class="vx-messages">
+    {% for message in messages %}
+      <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %} py-2" role="status">{{ message }}</div>
+    {% endfor %}
+  </div>
+{% endif %}

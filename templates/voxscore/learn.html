@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% comment %}
+  Screen 8: Learn. Lessons on the left and centre; the AI tutor on the right. The tutor form
+  posts to tutor-ask (ai_views.py), which renders this same template with `result`.
+{% endcomment %}
+{% block title %}Learn: {{ lesson.title }}{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <aside class="col-lg-2">
+    <div class="vx-label mb-2">Topics</div>
+    <nav class="vx-topics" aria-label="Lessons">
+      {% for l in lessons %}
+        <a href="{% url 'learn' l.slug %}" {% if l.slug == lesson.slug %}aria-current="page"{% endif %}>{{ l.title }}</a>
+      {% endfor %}
+    </nav>
+  </aside>
+
+  <div class="col-lg-6">
+    <h1 class="vx-page-title">{{ lesson.title }}</h1>
+    <p class="fs-5">{{ lesson.body }}</p>
+    <div class="vx-card">
+      <div class="vx-label mb-1">Example</div>
+      <p class="mb-2">{{ lesson.example_label }}: <span class="vx-mono">{{ example_names|join:" · " }}</span></p>
+      <div class="d-flex flex-wrap gap-2">
+        <button class="btn btn-outline-vx" type="button" id="play-example">▶ Play example</button>
+        <a class="btn btn-outline-vx" href="{% url 'tuner' %}">Try it in the tuner</a>
+      </div>
+    </div>
+  </div>
+
+  <aside class="col-lg-4">
+    <div class="vx-card h-100 d-flex flex-column gap-3">
+      <div class="d-flex align-items-center gap-2"><strong>Ask the tutor</strong><span class="vx-pill vx-pill--ai">AI</span></div>
+      {% if question %}<div class="vx-bubble vx-bubble--me">{{ question }}</div>{% endif %}
+      {% if result %}
+        {% if result.answer %}
+          <div class="vx-bubble vx-bubble--ai">
+            <div style="white-space:pre-line">{{ result.answer }}</div>
+            <div class="small vx-sub mt-2">
+              {% if result.source == "groq" %}Answered by AI ({{ result.model }}).
+              {% elif result.source == "local" %}Answered by the local model ({{ result.model }}).
+              {% else %}Built-in tip: no AI model was available.{% endif %}
+            </div>
+          </div>
+        {% else %}
+          <div class="alert alert-warning py-2 small mb-0">{{ result.note }}</div>
+        {% endif %}
+      {% endif %}
+      <form method="post" action="{% url 'tutor-ask' lesson.slug %}" class="mt-auto d-grid gap-2">
+        {% csrf_token %}
+        {{ form.topic }}
+        <label class="form-label small fw-semibold mb-0" for="{{ form.score.id_for_label }}">{{ form.score.label }}</label>
+        {{ form.score }}
+        <label class="visually-hidden" for="{{ form.question.id_for_label }}">Question</label>
+        <div class="d-flex gap-2">{{ form.question }}<button class="btn btn-vx" type="submit">Send</button></div>
+        {% for error in form.question.errors %}<div class="text-danger small">{{ error }}</div>{% endfor %}
+        <div class="small vx-sub">For example: “Why does my song sound sad?” or “What interval did I sing at the start?”</div>
+      </form>
+    </div>
+  </aside>
+</div>
+{{ lesson.example|json_script:"example" }}
+{% endblock %}
+{% block extra_js %}
+<script>
+  document.getElementById("play-example").onclick = () => {
+    const notes = Vox.readJSON("example").map((m, i) => ({ midi: m, start: i, dur: 1 }));
+    Vox.playNotes(notes, 100);
+  };
+</script>
+{% endblock %}

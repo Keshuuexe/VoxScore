@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% comment %}Screen 4: the warmup library. Filters are plain GET links, so they work without JS and can be bookmarked.{% endcomment %}
+{% block title %}Warmup library{% endblock %}
+{% block content %}
+<h1 class="vx-page-title">Practice</h1>
+{% include "voxscore/_practice_tabs.html" %}
+
+<form class="d-flex flex-wrap gap-2 mb-3" method="get" role="search">
+  <label class="visually-hidden" for="q">Search warmups</label>
+  <input class="form-control flex-grow-1" style="max-width:420px" id="q" name="q" type="search" value="{{ q }}" placeholder="Search warmups…">
+  <label class="visually-hidden" for="focus">Focus</label>
+  <select class="form-select" style="max-width:200px" id="focus" name="focus">
+    <option value="">Focus: any</option>
+    {% for value, label in focuses %}<option value="{{ value }}" {% if value == focus %}selected{% endif %}>{{ label }}</option>{% endfor %}
+  </select>
+  <input type="hidden" name="tradition" value="{{ tradition }}">
+  <button class="btn btn-outline-vx" type="submit">Search</button>
+</form>
+
+<div class="d-flex flex-wrap gap-2 align-items-center mb-4" aria-label="Filter by tradition">
+  <span class="small fw-semibold me-1">Tradition:</span>
+  <a class="vx-chip" href="?q={{ q|urlencode }}&focus={{ focus }}" {% if not tradition %}aria-current="true"{% endif %}>All</a>
+  {% for value, label in traditions %}
+    <a class="vx-chip" href="?tradition={{ value }}&q={{ q|urlencode }}&focus={{ focus }}" {% if value == tradition %}aria-current="true"{% endif %}>{{ label }}</a>
+  {% endfor %}
+</div>
+
+<div class="row g-3">
+  {% for ex in exercises %}
+    <div class="col-md-6 col-lg-4">
+      <div class="vx-card vx-ex-card">
+        <h2 class="h5 mb-0">{{ ex.name }}</h2>
+        <div class="small vx-sub">{{ ex.get_tradition_display }} · {{ ex.get_focus_display }} · {{ ex.minutes }} min</div>
+        <p class="small mb-2">{{ ex.instructions|truncatewords:18 }}</p>
+        <a class="btn btn-vx mt-auto align-self-start" href="{{ ex.get_absolute_url }}">Start</a>
+      </div>
+    </div>
+  {% empty %}
+    <p class="vx-sub">No warmups match. <a href="{% url 'warmup-list' %}">Clear the filters</a>.</p>
+  {% endfor %}
+</div>
+{% endblock %}

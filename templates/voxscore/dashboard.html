@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% comment %}Screen 2: two main areas (Hick's Law), recent work, streak, quick tuner.{% endcomment %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+  <h1 class="vx-page-title mb-0">Welcome back, {{ user.get_username }}</h1>
+  <span class="vx-pill">Practice streak: {{ streak }} day{{ streak|pluralize }}</span>
+  <a class="btn btn-outline-vx ms-auto" href="{% url 'tuner' %}">Quick tuner</a>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="vx-card vx-big-card h-100">
+          <div class="vx-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B1F3B" stroke-width="2" stroke-linecap="round"><path d="M12 3v10"/><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>
+          </div>
+          <h2>Practice</h2>
+          <p class="vx-sub mb-0">Tuner, drones, metronome and warmups with live feedback.</p>
+          <a class="btn btn-vx mt-auto" href="{% url 'tuner' %}">Start practicing</a>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="vx-card vx-big-card h-100">
+          <div class="vx-icon" aria-hidden="true">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1B1F3B" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 10h18M3 14h18M3 18h18"/><circle cx="9" cy="16" r="2" fill="#1B1F3B"/><path d="M11 16V5"/></svg>
+          </div>
+          <h2>Studio</h2>
+          <p class="vx-sub mb-0">Sing a melody and get sheet music to build on.</p>
+          <a class="btn btn-vx mt-auto" href="{% url 'studio-record' %}">Open Studio</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="vx-card h-100">
+      <h2 class="h5">Recent work</h2>
+      {% for score in recent_scores %}
+        <div class="vx-list-row">
+          <div class="flex-grow-1">
+            <div class="fw-semibold">{{ score.title }}</div>
+            <div class="small vx-sub">{{ score.key_name|default:"Key not set" }} · {{ score.n_parts }} part{{ score.n_parts|pluralize }} · {{ score.updated|date:"M j" }}</div>
+          </div>
+          <a class="btn btn-sm btn-outline-vx" href="{{ score.get_absolute_url }}">Open</a>
+        </div>
+      {% endfor %}
+      {% for s in recent_sessions %}
+        <div class="vx-list-row">
+          <div class="flex-grow-1">
+            <div class="fw-semibold">{% if s.warmup %}{{ s.warmup.name }}{% else %}{{ s.get_kind_display }} session{% endif %}</div>
+            <div class="small vx-sub">{{ s.created|date:"M j" }}{% if s.pitch_accuracy is not None %} · pitch {{ s.pitch_accuracy|floatformat:0 }}%{% endif %}</div>
+          </div>
+          {% if s.warmup %}<a class="btn btn-sm btn-outline-vx" href="{{ s.warmup.get_absolute_url }}">Again</a>{% endif %}
+        </div>
+      {% endfor %}
+      {% if not recent_scores and not recent_sessions %}
+        <p class="vx-sub mb-0">Nothing yet. Start with the tuner, or record your first melody in the Studio.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
