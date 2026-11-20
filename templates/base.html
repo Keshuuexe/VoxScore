@@ -17,7 +17,8 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+  {# Playfair Display = engraved score titles; Inter = UI text; Noto Music = real music symbols. #}
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&family=Noto+Music&family=Playfair+Display:ital,wght@0,700;0,800;1,500;1,700&display=swap">
   <link rel="stylesheet" href="{% static 'css/voxscore.css' %}">
   <link rel="icon" href="{% static 'img/voxscore-logo.svg' %}" type="image/svg+xml">
   {% block extra_css %}{% endblock %}
@@ -27,8 +28,8 @@
 <header class="vx-nav">
   <div class="container-xl d-flex align-items-center flex-wrap gap-2">
     <a class="vx-brand" href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'home' %}{% endif %}">
-      <img src="{% static 'img/voxscore-logo.svg' %}" alt="" width="28" height="28">
-      <span>VoxScore</span>
+      <img src="{% static 'img/voxscore-logo.svg' %}" alt="" width="34" height="34">
+      <span class="vx-wordmark">Vox<em>Score</em></span>
     </a>
     {% if user.is_authenticated %}
       <nav class="vx-links" aria-label="Main">
@@ -57,13 +58,20 @@
   {% block content %}{% endblock %}
 </main>
 
+{# The page ends like a score: a staff, the word "Fine" (Italian for "the end") and a final barline. #}
 <footer class="vx-footer">
-  <div class="container-xl">VoxScore · Train your voice, score your songs.</div>
+  <div class="container-xl">
+    <div class="vx-fine" aria-hidden="true">
+      <div class="vx-staff"></div><em>Fine</em><div class="vx-final"></div>
+    </div>
+    <div class="mt-2">VoxScore · Train your voice, score your songs.</div>
+  </div>
 </footer>
 
 {# Every page that talks to the server reads the CSRF token from here (static/js/audio.js). #}
 <script>window.VOX_CSRF = "{{ csrf_token }}";</script>
 <script src="{% static 'js/audio.js' %}"></script>
+<script src="{% static 'js/notes-fx.js' %}"></script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

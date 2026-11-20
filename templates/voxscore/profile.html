@@ -8,7 +8,7 @@
 {% block title %}Profile{% endblock %}
 {% block content %}
 <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
-  <div class="vx-icon rounded-circle d-grid" style="width:64px;height:64px;background:var(--vx-accent);place-items:center;font-family:Fraunces,serif;font-size:1.6rem;font-weight:700" aria-hidden="true">{{ user.get_username|first|upper }}</div>
+  <div class="vx-avatar" aria-hidden="true">{{ user.get_username|first|upper }}</div>
   <div>
     <h1 class="vx-page-title mb-0">{{ user.get_username }}</h1>
     <div class="vx-sub">Voice type: <strong id="voice-type">{{ profile.get_voice_type_display|default:"Not tested yet" }}</strong> · Range: <strong id="range-label">{{ profile.range_label }}</strong></div>
@@ -53,9 +53,9 @@
           <g font-size="10" fill="#5E6178">
             <text x="-26" y="4">100%</text><text x="-22" y="{{ chart.height|add:3 }}">0%</text>
           </g>
-          <line x1="0" y1="0" x2="{{ chart.width }}" y2="0" stroke="#ECE8DD"/>
-          <line x1="0" y1="{{ chart.height }}" x2="{{ chart.width }}" y2="{{ chart.height }}" stroke="#B8B3A3"/>
-          <polyline points="{{ chart.points }}" fill="none" stroke="#1B1F3B" stroke-width="2.5" stroke-linejoin="round"/>
+          <line x1="0" y1="0" x2="{{ chart.width }}" y2="0" stroke="#E4E2DC"/>
+          <line x1="0" y1="{{ chart.height }}" x2="{{ chart.width }}" y2="{{ chart.height }}" stroke="#111"/>
+          <polyline points="{{ chart.points }}" fill="none" stroke="#111" stroke-width="2.5" stroke-linejoin="round"/>
         </svg>
         <p class="small vx-sub mb-0">% of sung notes within 25 cents, per session ({{ chart.count }} sessions). From {{ chart.first|floatformat:0 }}% to {{ chart.last|floatformat:0 }}%.</p>
       {% else %}

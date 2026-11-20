@@ -36,11 +36,11 @@
     // Beat grid: bar lines darker than beats.
     for (let beat = 0; beat * spb < windowSec; beat++) {
       const x = (beat * spb / windowSec) * W;
-      g.fillStyle = (beat - countIn) % beatsPerBar === 0 ? "#B8B3A3" : "#ECE8DD";
+      g.fillStyle = (beat - countIn) % beatsPerBar === 0 ? "#8F8C84" : "#E8E6E0";
       g.fillRect(x, 0, 1.5, H);
     }
-    if (countIn) { g.fillStyle = "rgba(242,181,68,.18)"; g.fillRect(0, 0, (countIn * spb / windowSec) * W, H); }
-    g.strokeStyle = "#1B1F3B"; g.lineWidth = 3; g.beginPath();
+    if (countIn) { g.fillStyle = "rgba(17,17,17,.06)"; g.fillRect(0, 0, (countIn * spb / windowSec) * W, H); }
+    g.strokeStyle = "#111"; g.lineWidth = 3; g.beginPath();
     let pen = false;
     frames.forEach((f) => {
       if (!f.f) { pen = false; return; }

@@ -1,25 +1,117 @@
 {% extends "base.html" %}
+{% comment %}
+  The public homepage, laid out like the title page of a score: credits, a big engraved title,
+  a tempo marking, and the opening bars of a melody that write themselves onto the staff.
+  "Hear the opening" plays those bars and moves a playhead across them.
+  Note positions come from views.hero_staff().
+{% endcomment %}
 {% block title %}Train your voice, score your songs{% endblock %}
 {% block content %}
-<section class="vx-hero row g-5 align-items-center">
-  <div class="col-lg-6">
-    <span class="vx-label">For singers, arrangers and a cappella groups</span>
-    <h1 class="mt-2">Train your voice.<br>Score your songs.</h1>
-    <p class="vx-sub fs-5 mt-3">
-      VoxScore puts a tuner, metronome, drones and warmups from many singing traditions in one
-      place, with live feedback on pitch, rhythm and tone. Sing a melody and get sheet music
-      back, no theory degree or music software needed.
-    </p>
-    <div class="d-flex gap-2 mt-4 flex-wrap">
-      <a class="btn vx-btn-accent px-4" href="{% url 'signup' %}">Create a free account</a>
-      <a class="btn btn-outline-vx px-4" href="{% url 'login' %}">Log in</a>
+<section class="vx-titlepage mt-2">
+  <div class="vx-credits">
+    <span>Opus 1 · for voice, and for anyone who sings</span>
+    <span>Words &amp; music by <strong>you</strong></span>
+  </div>
+  <h1 class="vx-title">Vox<em>Score</em></h1>
+  <p class="vx-subtitle mb-4">Train your voice. Score your songs.</p>
+
+  <div class="vx-tempo"><span class="vx-glyph">&#x2669;</span> = {{ hero.bpm }} &nbsp; <em>Allegro con voce</em></div>
+  <svg class="vx-hero-staff" id="hero-staff" viewBox="0 0 1000 120" role="img"
+       aria-label="The opening bars of a melody on a treble staff" style="--travel: {{ hero.travel }}px; --dur: {{ hero.notes|length }}s">
+    <g stroke="#111" stroke-width="1.2">
+      <line x1="10" y1="30" x2="{{ hero.end }}" y2="30"/>
+      <line x1="10" y1="40" x2="{{ hero.end }}" y2="40"/>
+      <line x1="10" y1="50" x2="{{ hero.end }}" y2="50"/>
+      <line x1="10" y1="60" x2="{{ hero.end }}" y2="60"/>
+      <line x1="10" y1="70" x2="{{ hero.end }}" y2="70"/>
+      <line x1="10" y1="30" x2="10" y2="70" stroke-width="2"/>
+    </g>
+    <text class="vx-glyph" x="18" y="70" font-size="40" fill="#111">&#x1D11E;</text>
+    <g font-family="Playfair Display, Georgia, serif" font-weight="800" font-size="27" fill="#111" text-anchor="middle">
+      <text x="98" y="49">4</text><text x="98" y="69">4</text>
+    </g>
+    {% for b in hero.barlines %}<line x1="{{ b }}" y1="30" x2="{{ b }}" y2="70" stroke="#111" stroke-width="1.6"/>{% endfor %}
+    <line x1="{{ hero.end|add:-8 }}" y1="30" x2="{{ hero.end|add:-8 }}" y2="70" stroke="#111" stroke-width="1.6"/>
+    <rect x="{{ hero.end|add:-4 }}" y="30" width="5" height="40" fill="#111"/>
+    {% for n in hero.notes %}
+      <g class="note" data-index="{{ forloop.counter0 }}" style="animation-delay: {{ n.delay }}ms">
+        {% for ly in n.ledgers %}<line x1="{{ n.x|add:-13 }}" y1="{{ ly }}" x2="{{ n.x|add:13 }}" y2="{{ ly }}" stroke="#111" stroke-width="1.4"/>{% endfor %}
+        <line x1="{{ n.stem_x }}" y1="{{ n.y }}" x2="{{ n.stem_x }}" y2="{{ n.stem_y2 }}" stroke="#111" stroke-width="1.8"/>
+        <ellipse cx="{{ n.x }}" cy="{{ n.y }}" rx="7.4" ry="5.3" transform="rotate(-20 {{ n.x }} {{ n.y }})" fill="#111"/>
+      </g>
+    {% endfor %}
+    <rect class="playhead" x="{{ hero.notes.0.x|add:-12 }}" y="18" width="2.5" height="74" fill="#111" rx="1"/>
+  </svg>
+
+  <div class="d-flex flex-wrap justify-content-center gap-3 mt-3">
+    <a class="btn btn-vx px-4" href="{% url 'signup' %}">Start your first score</a>
+    <a class="btn btn-outline-vx px-4" href="{% url 'login' %}">Log in</a>
+    <button class="btn btn-outline-vx px-4" type="button" id="hear"><span class="vx-glyph">&#x266B;</span>&nbsp; Hear the opening</button>
+  </div>
+</section>
+
+<section class="row g-4 mt-4">
+  <div class="col-md-4">
+    <div class="vx-card vx-card--lift vx-movement">
+      <div class="vx-glyph" aria-hidden="true">&#x1D11E;</div>
+      <span class="vx-movement-num">I. Allegro</span>
+      <h3>Practice</h3>
+      <p class="mb-0 vx-sub">See the note you're singing and how far off it is, with drones, a metronome and guided warmups from a cappella, Western and Indian classical traditions.</p>
     </div>
   </div>
-  <div class="col-lg-6">{% include "voxscore/_staff_art.html" %}</div>
+  <div class="col-md-4">
+    <div class="vx-card vx-card--lift vx-movement">
+      <div class="vx-glyph" aria-hidden="true">&#x266B;</div>
+      <span class="vx-movement-num">II. Andante</span>
+      <h3>Studio</h3>
+      <p class="mb-0 vx-sub">Sing along to the click and VoxScore writes the sheet music: notes, rhythm, key and time signature. Add parts on top to build an arrangement.</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="vx-card vx-card--lift vx-movement">
+      <div class="vx-glyph" aria-hidden="true">&#x1D122;</div>
+      <span class="vx-movement-num">III. Adagio</span>
+      <h3>Learn</h3>
+      <p class="mb-0 vx-sub">Short theory lessons and an AI tutor that explains ideas using your own recordings.</p>
+    </div>
+  </div>
 </section>
-<section class="row g-3 mt-2">
-  <div class="col-md-4"><div class="vx-card h-100"><h3 class="h5">Practice</h3><p class="mb-0 vx-sub">See the note you're singing and how far off it is, with drones, a metronome and guided warmups from a cappella, Western and Indian classical traditions.</p></div></div>
-  <div class="col-md-4"><div class="vx-card h-100"><h3 class="h5">Studio</h3><p class="mb-0 vx-sub">Sing along to the click and VoxScore writes the sheet music: notes, rhythm, key and time signature. Add parts on top to build an arrangement.</p></div></div>
-  <div class="col-md-4"><div class="vx-card h-100"><h3 class="h5">Learn</h3><p class="mb-0 vx-sub">Short theory lessons and an AI tutor that explains ideas using your own recordings.</p></div></div>
+
+<section class="mt-5">
+  <h2 class="text-center mb-1">From a hum to a score in three bars</h2>
+  <p class="text-center vx-sub mb-4">No theory degree, no music software.</p>
+  <div class="vx-steps">
+    <div><div class="vx-step-n">1</div><h3 class="h5 mt-2">Sing along to the click</h3><p class="vx-sub mb-4">Pick a tempo and time signature, then sing your idea after a one-bar count-in.</p></div>
+    <div><div class="vx-step-n">2</div><h3 class="h5 mt-2">See it written</h3><p class="vx-sub mb-4">VoxScore finds the notes, snaps them to the beat and works out the key.</p></div>
+    <div><div class="vx-step-n">3</div><h3 class="h5 mt-2">Shape the arrangement</h3><p class="vx-sub mb-4">Fix any note, then record harmony parts on top, one voice at a time.</p></div>
+  </div>
 </section>
+
+<section class="text-center mt-5">
+  <p class="vx-subtitle mb-3">Made for singers first, and for every musician next.</p>
+  <a class="btn btn-vx px-4" href="{% url 'signup' %}">Create a free account</a>
+</section>
+
+{{ hero.melody|json_script:"hero-melody" }}
+{% endblock %}
+{% block extra_js %}
+<script>
+  /* "Hear the opening": play the melody, light up each note as it sounds, sweep a playhead. */
+  (function () {
+    const staff = document.getElementById("hero-staff");
+    const notes = staff.querySelectorAll(".note");
+    const melody = Vox.readJSON("hero-melody");
+    let stop = null;
+    document.getElementById("hear").addEventListener("click", () => {
+      if (stop) stop();
+      staff.classList.remove("is-playing");
+      void staff.getBoundingClientRect();  // restart the playhead animation
+      staff.style.setProperty("--dur", (melody.length * 60 / {{ hero.bpm }}) + "s");
+      staff.classList.add("is-playing");
+      stop = Vox.playNotes(melody, {{ hero.bpm }}, (i) => {
+        notes.forEach((n, k) => n.classList.toggle("is-on", k === i));
+      });
+    });
+  })();
+</script>
 {% endblock %}

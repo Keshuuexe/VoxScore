@@ -89,10 +89,46 @@ def practice_streak(user, today=None):
 
 # ------------------------------------------------------------------------- home + dashboard
 
+# The homepage's opening melody (an original phrase): C major, three bars of quarter notes.
+HERO_MELODY = [60, 64, 67, 72, 71, 67, 69, 65, 64, 62, 64, 60]
+HERO_BPM = 104
+
+
+def hero_staff(melody=HERO_MELODY):
+    """
+    Positions for drawing `melody` on a treble staff in the homepage SVG.
+
+    Staff lines sit at y = 30, 40, 50, 60, 70 (E4 on the bottom line); each step of the scale
+    moves a note 5 units. Stems go up below the middle line (B4) and down from it, ledger lines
+    are added below the staff, and a barline follows every fourth note, as in printed music.
+    """
+    letter_index = {0: 0, 2: 1, 4: 2, 5: 3, 7: 4, 9: 5, 11: 6}  # natural notes only (C major)
+    notes, barlines = [], []
+    for i, midi in enumerate(melody):
+        step = (midi // 12 - 1) * 7 + letter_index[midi % 12]   # MIDI 60 = C4, octave 4
+        y = 70 - (step - 30) * 5            # step 30 = E4, the bottom line
+        x = 160 + i * 66
+        stem_up = step < 34                  # 34 = B4, the middle line
+        ledgers = [ly for ly in range(80, y + 1, 10)]
+        notes.append({
+            "x": x, "y": y, "stem_up": stem_up, "ledgers": ledgers, "delay": 250 + i * 110,
+            "stem_x": x + 6 if stem_up else x - 6,
+            "stem_y2": y - 34 if stem_up else y + 34,
+        })
+        if i % 4 == 3 and i < len(melody) - 1:
+            barlines.append(x + 33)
+    return {
+        "notes": notes, "barlines": barlines, "end": notes[-1]["x"] + 36,
+        "travel": notes[-1]["x"] - notes[0]["x"] + 20,
+        "melody": [{"midi": m, "start": i, "dur": 1} for i, m in enumerate(melody)],
+        "bpm": HERO_BPM,
+    }
+
+
 def home(request):
     if request.user.is_authenticated:
         return redirect("dashboard")
-    return render(request, "voxscore/home.html")
+    return render(request, "voxscore/home.html", {"hero": hero_staff()})
 
 
 @login_required

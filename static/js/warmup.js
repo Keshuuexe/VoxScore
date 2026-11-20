@@ -50,9 +50,9 @@
     const y = (m) => H - ((m - lo) / (hi - lo)) * H;
     const total = notes.length * spb;
     g.clearRect(0, 0, W, H);
-    g.fillStyle = "rgba(242,181,68,.35)";
+    g.fillStyle = "rgba(17,17,17,.12)";
     notes.forEach((m, i) => g.fillRect((i * spb / total) * W, y(m) - 6, (spb / total) * W - 4, 12));
-    g.strokeStyle = "#1B1F3B"; g.lineWidth = 2.5; g.beginPath();
+    g.strokeStyle = "#111"; g.lineWidth = 2.5; g.beginPath();
     let pen = false;
     frames.filter((f) => f.t >= singStart && f.t <= singStart + total).forEach((f) => {
       if (!f.f) { pen = false; return; }
